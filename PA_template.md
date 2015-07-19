@@ -1,19 +1,16 @@
----
-title: "PA_template"
-author: "Jonathan Lewyckyj"
-date: "July 18, 2015"
-output: 
-  html_document:
-    keep_md: yes
----
+# PA_template
+Jonathan Lewyckyj  
+July 18, 2015  
 
-```{r}
+
+```r
 echo = TRUE
 ```
 
 #Loading and Preprocessing the Data
 
-```{r}
+
+```r
 setwd("/Users/Jonathan/Desktop/Coursera/RepResearch")
 data <- read.csv("activity.csv", colClasses = c("integer", "Date", "factor"))
 
@@ -24,25 +21,47 @@ data2 <- na.omit(data)
 
 ##Calculate the total number of steps taken per day
 
-```{r}
+
+```r
 totalSteps <- aggregate(data2$steps, list(Date = data2$date), FUN = "sum")$x
 ```
 
 ##Make a histogram of the total number of steps taken each day
 
-```{r}
-library(ggplot2)
 
+```r
+library(ggplot2)
+```
+
+```
+## Warning: package 'ggplot2' was built under R version 3.1.3
+```
+
+```r
 ggplot(data2, aes(date, steps)) + geom_bar(stat = "identity") + labs(title = "Histogram of Total Number of Steps Per Day", x = "Date", y = "Total Number of Steps")
 ```
 
+![](PA_template_files/figure-html/unnamed-chunk-4-1.png) 
+
 ##Calculate and report the mean and median of the total number of steps taken per day
 
-```{r}
+
+```r
 medianTotalSteps <- median(totalSteps)
 meanTotalSteps <- mean(totalSteps)
 print(medianTotalSteps)
+```
+
+```
+## [1] 10765
+```
+
+```r
 print(meanTotalSteps)
+```
+
+```
+## [1] 10766.19
 ```
 
 #What is the average daily activity pattern?
@@ -50,25 +69,39 @@ print(meanTotalSteps)
 ##Make a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and 
 ##the average number of steps taken, averaged across all days (y-axis)
 
-```{r}
+
+```r
 avgSteps <- aggregate(data2$steps, list(interval = as.numeric(as.character(data2$interval))), FUN = "mean")
 names(avgSteps)[2] <- "MeanSteps"
 
 ggplot(avgSteps, aes(interval, MeanSteps)) + geom_line(color = "red") + labs(title = "Time Series Plot of the 5-Minute Interval", x = "5-Minute Intervals", y = "Average Number of Steps")
 ```
 
+![](PA_template_files/figure-html/unnamed-chunk-6-1.png) 
+
 ##Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
 
-```{r}
+
+```r
 avgSteps[avgSteps$MeanSteps == max(avgSteps$MeanSteps), ]
+```
+
+```
+##     interval MeanSteps
+## 104      835  206.1698
 ```
 
 #Imputing missing values
 
 ##Calculate and report the total number of missing values in the dataset
 
-```{r}
+
+```r
 sum(is.na(data))
+```
+
+```
+## [1] 2304
 ```
 
 ##Devise a strategy for filling in all of the missing values in the dataset.
@@ -79,7 +112,8 @@ sum(is.na(data))
 
 ##Create a new dataset that is equal to the original dataset but with the missing data filled in
 
-```{r}
+
+```r
 imputedData <- data 
 for (i in 1:nrow(imputedData)) {
     if (is.na(imputedData$steps[i])) {
@@ -90,13 +124,17 @@ for (i in 1:nrow(imputedData)) {
 
 ##Make a histogram of the total number of steps taken each day
 
-```{r}
+
+```r
 ggplot(imputedData, aes(date, steps)) + geom_bar(stat = "identity") + labs(title = "Histogram of Total Number of Steps Per Day (Imputed Data)", x = "Date", y = "Total Number of Steps")
 ```
 
+![](PA_template_files/figure-html/unnamed-chunk-10-1.png) 
+
 ##Calculate and report the mean and median total number of steps taken per day
 
-```{r}
+
+```r
 totalSteps.Imputed <- aggregate(imputedData$steps, list(Date = imputedData$date), FUN = "sum")$x
 
 medianTotalSteps.Imputed <- median(totalSteps.Imputed)
@@ -106,11 +144,37 @@ meanTotalSteps.Imputed <- mean(totalSteps.Imputed)
 ##Do these values differ from the estimates from the first part of the assignment?
 ##What is the impact of imputing missing data on the estimates of the total daily number of steps?
 
-```{r}
+
+```r
 print(medianTotalSteps)
+```
+
+```
+## [1] 10765
+```
+
+```r
 print(medianTotalSteps.Imputed)
+```
+
+```
+## [1] 10766.19
+```
+
+```r
 print(meanTotalSteps)
+```
+
+```
+## [1] 10766.19
+```
+
+```r
 print(meanTotalSteps.Imputed)
+```
+
+```
+## [1] 10766.19
 ```
 
 ###Mean stays the same, Median is raised by 1.19
@@ -120,7 +184,8 @@ print(meanTotalSteps.Imputed)
 ##Create a new factor variable in the dataset with two levels - "weekday" and "weekend" 
 ##indicating whether a given date is a weekday or a weekend
 
-```{r}
+
+```r
 data2$weekday <- weekdays(data2$date)
 data2$weekday <- ifelse(data2$weekday %in% c("Saturday", "Sunday"), "weekend", "weekday")
 
@@ -131,9 +196,12 @@ levels(data2$weekday) <- list(weekday = c("Monday", "Tuesday", "Wednesday", "Thu
 ##of steps taken, averaged across all weekday days or weekend days (y-axis). See the README file in the GitHub repository to see 
 ##an example of what this plot should look like using simulated data.
 
-```{r}
+
+```r
 avgSteps2 <- aggregate(data2$steps, list(interval = as.numeric(as.character(data2$interval)), weekday = data2$weekday), FUN = "mean")
 names(avgSteps2)[3] <- "MeanSteps"
 
 ggplot(avgSteps2, aes(x = interval, y = MeanSteps)) + geom_line(color = "red") + facet_grid(. ~ weekday) + labs(title = "Time Series Plot of the 5-Minute Interval, by weekday/weekend", x = "5-Minute Intervals", y = "Average Number of Steps")
 ```
+
+![](PA_template_files/figure-html/unnamed-chunk-14-1.png) 
